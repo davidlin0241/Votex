@@ -17,7 +17,6 @@
   <body>
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas" width="750px" height="750px"></canvas>
-    <div class="hello"></div>
     
   </body>
   <script>
@@ -27,7 +26,20 @@
     paper.setup(canvas);
     var tool = new paper.Tool();
     var path = new paper.Path();
-    var clients = [];
+//     var colors = {};
+    var paths = {};
+    var myID;
+    var myColor;
+    
+    function getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
     
 
     // getting the URL (you may want to use for Exercise 3)
@@ -35,50 +47,44 @@
 
     var socket = new WebSocket('wss://p3-websockets-andreachisholm-andreaschisholm981773.codeanyapp.com/ws/draw');
     socket.onmessage = function(receivedMessage) {
-      var data = (receivedMessage.data).toString();
-      //$('.hello').append('<div>'+data+'</div>');
-      var pointArr = data.split(":");
+      //parse the JSON object received
+      var parsed = JSON.parse(receivedMessage.data);
+      //get the ID 
+      var receivedID = (parsed.clientID).toString();
+      //get the x and y coordinates
+      var pointArr = parsed.sendPoint.split(":");
       var newPoint = new paper.Point(pointArr);
+      //get the color for the curr ID
+      var color = parsed.color;
+      if (!(receivedID in paths)) {
+        paths[receivedID] = new paper.Path();
+      }
+      
+      paths[receivedID].strokeColor = color;
+      paths[receivedID].add(newPoint);
 
-      path.strokeColor = 'black';
-      path.add(newPoint);
-
-//       var path = new paper.Path();
-//       var arrayLength = data.length;
-//       console.log("length" + arrayLength);
-//       for (var i = 0; i < arrayLength; i++) {
-//           console.log(data[i]);
-//           var points = JSON.parse(data[i]);
-//           var xPoint = points.x;
-//           var yPoint = points.y;
-//           var finalPoint = new paper.Point(xPoint, yPoint);
-//           path.add(finalPoint);
-//       }
     }
     
     socket.onopen = function(event) {
         
-        //var pathPoints = [];
-        var clientID = Math.floor((Math.random() * 1000) + 1);
+        var createClientID = Math.floor((Math.random() * 1000) + 1);
+
+        myColor = getRandomColor();
+        myID = createClientID;
 
         tool.onMouseMove = function(event) {
-            // Add a point to the path every time the mouse is dragged
-            path.strokeColor = 'black';
-            path.add(event.point);
-//             console.log("sent");
-//             console.log(event.point);
-            //console.log(event.point);
+
             var xPoint = event.point.x;
             var yPoint = event.point.y;
             var sendPoint = xPoint.toString()+":"+yPoint.toString();
-//             var newPoint = {
-//               x : (event.point.x).toString(),
-//               y : (event.point.y).toString()
-//             }
-//             pathPoints.push(sendPoint);
-//             socket.send(pathPoints);
-            socket.send(sendPoint);
-            
+            var sendInfo = {
+              "clientID":createClientID,
+              "color":myColor,
+              "sendPoint":sendPoint
+            }
+            var sendInfoObj = JSON.stringify(sendInfo);
+            socket.send(sendInfoObj);
+
         }
       };
 
