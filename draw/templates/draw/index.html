@@ -54,6 +54,7 @@
     var url = window.location.href;
 
     var socket = new WebSocket('wss://p3-websockets-andreachisholm-andreaschisholm981773.codeanyapp.com/ws/draw');
+
     if (url.indexOf("large") > -1) {
       socket.onmessage = function(receivedMessage) {
         //parse the JSON object received
@@ -72,6 +73,7 @@
 
         //draw the path
         paths[receivedID].strokeColor = color;
+        paths[receivedID].strokeWidth = 5;
         paths[receivedID].add(newPoint);
 
       }
@@ -98,9 +100,9 @@
         
 
         window.addEventListener('devicemotion', (event) => {
-          x1 = event.accelerationIncludingGravity.x;
-          y1 = event.accelerationIncludingGravity.y;
-          z1 = event.accelerationIncludingGravity.z;
+          x1 = event.acceleration.x;
+          y1 = event.acceleration.y;
+          z1 = event.acceleration.z;
           
         });
       
@@ -123,9 +125,10 @@
               newColor = getRandomColor();
               myColor = newColor;
               path.strokeColor = newColor;
+              path.strokeWidth = 5;
               changeColor = false;
               
-            }
+            } 
           
 
             // Update new position
@@ -136,9 +139,11 @@
         
         //execute when the mouse moves
         tool.onMouseMove = function(event) {
+
             if (url.indexOf("small") > -1) {
               
               path.strokeColor = myColor;
+              path.strokeWidth = 5;
               path.add(event.point);
               
               //get x and y coordinates of the mouse
@@ -160,6 +165,8 @@
         
     };
     
+
+
 
 
 
