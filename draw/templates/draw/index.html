@@ -17,6 +17,9 @@
   <body>
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas" width="750px" height="750px"></canvas>
+    <div class="hello">
+      
+    </div>
     
   </body>
   <script>
@@ -82,6 +85,54 @@
         myColor = getRandomColor();
         myID = createClientID;
         path = new paper.Path();
+      
+      
+        var sensitivity = 20;
+        var x1 = 0;
+        var y1 = 0;
+        var z1 = 0;
+        var x2 = 0;
+        var y2 = 0;
+        var z2 = 0;
+        var changeColor = false;
+        
+
+        window.addEventListener('devicemotion', (event) => {
+          x1 = event.accelerationIncludingGravity.x;
+          y1 = event.accelerationIncludingGravity.y;
+          z1 = event.accelerationIncludingGravity.z;
+          
+        });
+      
+        window.addEventListener('deviceorientation', (event) => {
+          if (event.gamma > 45) {
+            changeColor = true;
+          }
+          
+        });
+
+        setInterval(function () {
+            var change = Math.abs(x1-x2+y1-y2+z1-z2);
+
+            if (change > sensitivity) {
+                path.remove();
+                path = new paper.Path();
+                myID = Math.floor((Math.random() * 1000) + 1);
+               
+            } else if (changeColor == true) {
+              newColor = getRandomColor();
+              myColor = newColor;
+              path.strokeColor = newColor;
+              changeColor = false;
+              
+            }
+          
+
+            // Update new position
+            x2 = x1;
+            y2 = y1;
+            z2 = z1;
+        }, 150);
         
         //execute when the mouse moves
         tool.onMouseMove = function(event) {
@@ -106,10 +157,10 @@
             }
         } 
         
-
         
-      };
+    };
     
+
 
 
   </script>
