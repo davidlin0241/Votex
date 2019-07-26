@@ -19,6 +19,7 @@
       body {
         font-family: "Quicksand";
         background-color: #FFF;
+        color: #494949;
       }
       
       .nav-bar {
@@ -49,12 +50,12 @@
         height: 410px;
         width: 100%;
         
-        margin: 33px 0px;
+        margin: 20px 0px;
         border-radius: 5px;
        }
       
       .option-pic {
-        width: 50%;
+        width: 100%;
         border-radius: 10px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
       }
@@ -158,6 +159,15 @@
         margin-left: 13px;
       }
       
+      #change-vote {
+        background-color: #A0DFF4;
+        border-radius: 100px;
+        width: 50%;
+        margin: auto;
+        box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.15);
+        color: #FFF;
+      }
+      
       
     </style>
 
@@ -171,17 +181,65 @@
       
       <div class="row" style="padding-top: 40px;">
         <div class="col-sm-12" style="text-align: center;">
-          <h1 class="vote-topic">VOTE FOR OUR NEXT EVENT</h1>
+          <div class="voted">
+            <br>
+            <br>
+            <br>
+          </div>
+          <h1 class="not-voted vote-topic">VOTE FOR OUR NEXT EVENT</h1>
+          <h1 class="voted vote-topic">THANKS FOR VOTING!</h1>
           <br>
-          <h4 class="vote-deadline">Vote by this Friday!</h4>
+          <div class="voted">
+            <br>
+          </div>
+          <h4 class="not-voted vote-deadline">Vote by this Friday!</h4>
+          <h4 class="voted vote-deadline">Poll ends this Friday</h4>
           <h4 class="voting-instructions">Double Tap To Vote</h4>
         </div>
       </div>
       
       
-      <div class="row" style="padding: 0px 50px;">
-        <div class="col-sm-12"> 
-          <div class="option-box" id="option-1"> <img id="minigolf-small" class="option-pic" src="/static/draw/images/minigolf-small.jpg"></div>  
+      
+      
+      <!-- VOTING OPTIONS -->
+      <div class="not-voted row" style="padding: 0px 50px;">
+        <div class="col-sm-6"> 
+          <div class="option-box" id="option-3"> <img id="picnic-small" class="option-pic" src="/static/draw/images/picnic-small.jpg"></div> 
+          <div class="option-box" id="option-2"> <img id="golf-small" class="option-pic" src="/static/draw/images/minigolf-small.jpg"></div>
+          
+        </div>
+        <div class="col-sm-6">
+          <div class="option-box" id="option-1"> <img id="bowling-small" class="option-pic" src="/static/draw/images/bowling-small.jpg"></div>
+           
+          <div class="option-box" id="option-4"> <img id="lasertag-small" class="option-pic" src="/static/draw/images/lasertag-small.jpg"></div>
+        </div>
+      </div>
+      
+      
+      <!-- VOTED  -->
+      <div class="voted" class="row" style="padding: 0px 50px;">
+        <div class="col-sm-12" style="text-align: center"> 
+          <br>
+          <br>
+          <br>
+         
+          <div class="option-box" id="option-3"> <img style="width: 60%;" id="v-picnic-small" class="option-pic" src="/static/draw/images/picnic-small.jpg"></div> 
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <div style="font-size:50px; margin-top: -10px;">
+            You voted for Picnic
+          </div>
+          <br>
+          <br>
+          <div style="font-size:50px" id="change-vote">
+            CHANGE VOTE
+          </div>
+          
+         <br>
+          <br>
         </div>
         
       </div>
@@ -245,48 +303,84 @@
 
   </body>
   <script>
+    $('.voted').hide();
+    $('.not-voted').show();
+    var socketLarge = new WebSocket('wss://p3-websockets-andreachisholm-andreaschisholm981773.codeanyapp.com/ws/draw/voteLarge');
+//     var socketSmall = new WebSocket('wss://p3-websockets-andreachisholm-andreaschisholm981773.codeanyapp.com/ws/draw/voteSmall');
     
-    var socket = new WebSocket('wss://p3-websockets-andreachisholm-andreaschisholm981773.codeanyapp.com/ws/draw');
-    
-    socket.onopen = function(event) {}
+  
+    /*
+    socketLarge.onopen = function(event) {
+      socketLarge.send("hello from small");
+    }
+    */
     
     var option1 = document.getElementById('option-1');
     var option2 = document.getElementById('option-2');
     var option3 = document.getElementById('option-3');
     var option4 = document.getElementById('option-4');
+    var change = document.getElementById('change-vote');
     
     var manager1 = new Hammer.Manager(option1);
     var manager2 = new Hammer.Manager(option2);
     var manager3 = new Hammer.Manager(option3);
     var manager4 = new Hammer.Manager(option4);
+    var manager5 = new Hammer.Manager(change);
     
     var DoubleTap1 = new Hammer.Tap({event: 'doubletap', taps: 2, interval:1000, time:1000});
     var DoubleTap2 = new Hammer.Tap({event: 'doubletap', taps: 2, interval:1000, time:1000});
     var DoubleTap3 = new Hammer.Tap({event: 'doubletap', taps: 2, interval:1000, time:1000});
     var DoubleTap4 = new Hammer.Tap({event: 'doubletap', taps: 2, interval:1000, time:1000});
+    var Tap = new Hammer.Tap();
+    
+    /*
+    var DoubleTap1 = new Hammer.Tap();
+    var DoubleTap2 = new Hammer.Tap();
+    var DoubleTap3 = new Hammer.Tap();
+    var DoubleTap4 = new Hammer.Tap();
+    var Tap = new Hammer.Tap();
+    */
     
     manager1.add(DoubleTap1);
     manager2.add(DoubleTap2);
     manager3.add(DoubleTap3);
     manager4.add(DoubleTap4);
+    manager5.add(Tap);
     
     manager1.on('doubletap', function(e) {
-       alert("Thanks for choosing option 1!");
+       socketLarge.send("bowling");
+     
     });
     
     manager2.on('doubletap', function(e) {
-       alert("Thanks for choosing option 2!");
+      socketLarge.send("minigolf");
     });
    
     
     manager3.on('doubletap', function(e) {
-       alert("Thanks for choosing option 3!");
+      console.log('hello')
+      socketLarge.send("picnic");
+      $('.voted').show();
+      $('.not-voted').hide();
+      $('.voting-instructions').hide();
     });
-    
-    
+   
     manager4.on('doubletap', function(e) {
-       alert("Thanks for choosing option 4!");
+      socketLarge.send("lasertag");
+      //socketLarge.send("/static/draw/images/lasertag-small.jpg");
     });
+    
+    manager5.on('tap', function(e) {
+      $('.voted').hide();
+      $('.not-voted').show();
+      $('.voting-instructions').show();
+    })
+    
+    
+    
+    
+    
+    
     
     /*
     var tap = document.getElementById('option-1');
