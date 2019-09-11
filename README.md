@@ -1,7 +1,7 @@
 # Votex
 Mobile collaboration to Large Display Project
 
-Completed with andreachisholm 
+Completed with andreachisholm, using Codeanywhere (she pushed the code). 
 
 Project task: come up with and implement an idea that allows users to collaborate on their mobile devices and have the result of their collaboration show up on a larger display (e.g. a projector screen) in some way.
 
