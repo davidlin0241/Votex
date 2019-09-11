@@ -12,5 +12,5 @@ websocket_urlpatterns = [
 
 # websocket_urlpatterns = [
 #    url(r'^ws/draw/voteSmall$', consumers.DrawConsumer),
-# ]
+# ] 
 
