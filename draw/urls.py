@@ -12,5 +12,5 @@ urlpatterns = [
     path('voteWinner/', views.voteWinner, name='voteWinner'),
     path('voteSmallConfirmation/', views.voteSmallConfirmation, name='voteSmallConfirmation'),
     path('wst/', views.wst, name='wst'),
-]
+] 
 
